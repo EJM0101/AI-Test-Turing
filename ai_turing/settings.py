@@ -4,7 +4,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-chatbot'
 DEBUG = True
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['ai-test-turing.onrender.com']
 
 INSTALLED_APPS = [
     'django.contrib.staticfiles',
