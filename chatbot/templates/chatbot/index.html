@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Test de Turing - Chat</title>
+    <style>
+        body {{ font-family: sans-serif; padding: 2rem; }}
+        .chat {{ border: 1px solid #ccc; padding: 1rem; height: 300px; overflow-y: auto; }}
+        .input-group {{ margin-top: 1rem; display: flex; }}
+        input {{ flex: 1; padding: 0.5rem; }}
+        button {{ padding: 0.5rem 1rem; }}
+        .bot {{ background: #eef; margin: 0.5rem 0; padding: 0.5rem; border-radius: 5px; }}
+        .user {{ background: #cfc; margin: 0.5rem 0; padding: 0.5rem; border-radius: 5px; text-align: right; }}
+    </style>
+</head>
+<body>
+    <h1>Test de Turing - Qui est l’IA ?</h1>
+    <div class="chat" id="chatbox"></div>
+    <div class="input-group">
+        <input id="msgInput" placeholder="Pose une question...">
+        <button onclick="sendToBots()">Envoyer</button>
+    </div>
+    <script>
+        function append(sender, text) {{
+            const div = document.createElement('div');
+            div.className = sender === 'User' ? 'user' : 'bot';
+            div.textContent = sender + ": " + text;
+            document.getElementById('chatbox').appendChild(div);
+        }}
+
+        function sendToBots() {{
+            const input = document.getElementById('msgInput');
+            const text = input.value;
+            if (!text.trim()) return;
+            append('User', text);
+            input.value = '';
+            ['gpt', 'fake'].forEach(role => {{
+                const form = new FormData();
+                form.append('message', text);
+                form.append('role', role);
+                fetch('/send/', {{ method: 'POST', body: form }})
+                    .then(res => res.json())
+                    .then(data => append(role === 'gpt' ? 'Bot GPT' : 'Bot Fake', data.reply));
+            }});
+        }}
+    </script>
+</body>
+</html>
