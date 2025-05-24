@@ -35,4 +35,4 @@ def send_message(request):
             data = hf_response.json()
             reply = data[0]['generated_text'] if isinstance(data, list) else "[Erreur GPT]"
 
-        return JsonResponse({'reply': reply})
+        return JsonResponse({{'reply': reply}})
