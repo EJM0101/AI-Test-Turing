@@ -25,9 +25,9 @@ def send_message(request):
             reply = random.choice(FAKE_REPLIES)
         else:
             hf_response = requests.post(
-                'https://api-inference.huggingface.co/models/bigscience/bloom-560m',
+                'https://api-inference.huggingface.co/models/gpt2',
                 headers={{
-                    'Authorization': f"Bearer {os.getenv('HF_API_KEY', '')}",
+                    'Authorization': f"Bearer {os.getenv('HF_API_KEY', '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')}",
                     'Content-Type': 'application/json',
                 }},
                 json={{"inputs": user_msg}}
