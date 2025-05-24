@@ -26,13 +26,13 @@ def send_message(request):
         else:
             hf_response = requests.post(
                 'https://api-inference.huggingface.co/models/gpt2',
-                headers={{
+                headers={
                     'Authorization': f"Bearer {os.getenv('HF_API_KEY', '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')}",
                     'Content-Type': 'application/json',
-                }},
-                json={{"inputs": user_msg}}
+                },
+                json={"inputs": user_msg}
             )
             data = hf_response.json()
             reply = data[0]['generated_text'] if isinstance(data, list) else "[Erreur GPT]"
 
-        return JsonResponse({{'reply': reply}})
+        return JsonResponse({'reply': reply})
