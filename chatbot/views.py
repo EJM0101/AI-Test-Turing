@@ -26,7 +26,7 @@ def send_message(request):
         else:
             try:
                 hf_response = requests.post(
-                    'https://api-inference.huggingface.co/models/tiiuae/falcon-7b-instruct',
+                    'https://api-inference.huggingface.co/models/openai-community/gpt2',
                     headers={
                         'Authorization': f"Bearer {os.getenv('HF_API_KEY', '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')}",
                         'Content-Type': 'application/json',
