@@ -26,7 +26,7 @@ def send_message(request):
         else:
             try:
                 hf_response = requests.post(
-                    'https://api-inference.huggingface.co/models/gpt2',
+                    'https://api-inference.huggingface.co/models/bigscience/bloom-560m',
                     headers={
                         'Authorization': f"Bearer {os.getenv('HF_API_KEY', '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')}",
                         'Content-Type': 'application/json',
