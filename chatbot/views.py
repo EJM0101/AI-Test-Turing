@@ -1,3 +1,4 @@
+import os
 import random
 import requests
 from django.shortcuts import render
@@ -7,7 +8,7 @@ from django.http import JsonResponse
 FAKE_REPLIES = [
     "Bonne question ! Qu'en penses-tu, toi ?",
     "Je suis d'accord, c’est assez complexe à dire.",
-    "Tu poses toujours des choses intéressantes...",
+    "Je t’avoue que je ne sais pas trop.",
 ]
 
 @csrf_exempt
@@ -25,13 +26,22 @@ def send_message(request):
         else:
             try:
                 response = requests.post(
-                    "https://chat.tune.app/api/chat",
-                    headers={"Content-Type": "application/json"},
-                    json={"messages": [{"role": "user", "content": user_msg}]}
+                    "https://openrouter.ai/api/v1/chat/completions",
+                    headers={
+                        "Authorization": f"Bearer {os.getenv('OPENROUTER_API_KEY')}",
+                        "Content-Type": "application/json",
+                        "HTTP-Referer": "https://ton-site.com",  # facultatif
+                        "X-Title": "TuringBot",  # nom de ton app
+                    },
+                    json={
+                        "model": "openai/gpt-3.5-turbo",
+                        "messages": [{"role": "user", "content": user_msg}],
+                        "temperature": 0.7,
+                    }
                 )
                 data = response.json()
-                reply = data["message"]
+                reply = data["choices"][0]["message"]["content"]
             except Exception as e:
-                reply = f"[Erreur TuneGPT : {str(e)} / Réponse : {response.text}]"
+                reply = f"[Erreur OpenRouter : {str(e)}]"
 
         return JsonResponse({'reply': reply})
