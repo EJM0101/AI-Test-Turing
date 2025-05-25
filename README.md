@@ -40,7 +40,7 @@ Ce projet permet de :
 ## Installation locale
 
 ```bash
-git clone https://github.com/EJM0101/AI-Test-turing.git
+git clone https://github.com/EJM0101/AI-Test-Turing.git
 cd turing-chatbot
 pip install -r requirements.txt
 python manage.py
