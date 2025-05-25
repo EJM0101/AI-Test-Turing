@@ -5,33 +5,33 @@
   <title>Test de Turing - Qui est l’IA ?</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body {
-      background: #f0f2f5;
-      margin: 0;
+    bo   background: #f2f4f8;
       padding: 2rem;
     }
     .container {
-      max-width: 600px;
+      max-width: 700px;
       margin: auto;
       background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      overflow: hidden;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 1.5rem;
     }
     h1 {
       text-align: center;
-      padding: 1rem;
-      margin: 0;
-      background: #1e88e5;
-      color: white;
-      font-size: 1.5rem;
+      color: #1e88e5;
+    }
+    p.description {
+      text-align: center;
+      color: #555;
+      margin-bottom: 1.5rem;
     }
     .chat {
       height: 400px;
       overflow-y: auto;
+      border: 1px solid #ccc;
       padding: 1rem;
-      border-top: 1px solid #ddd;
-      border-bottom: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 1rem;
     }
     .message {
       margin: 0.5rem 0;
@@ -40,56 +40,74 @@
       max-width: 80%;
       line-height: 1.4;
     }
-    .user {
-      background-color: #d1f5d3;
-      align-self: flex-end;
-      text-align: right;
-      margin-left: auto;
-    }
-    .bot {
-      background-color: #e3e8f0;
-      align-self: flex-start;
-      text-align: left;
-      margin-right: auto;
-    }
+    .user { background-color: #c8e6c9; margin-left: auto; text-align: right; }
+    .botA { background-color: #bbdefb; }
+    .botB { background-color: #ffe082; }
     .input-group {
       display: flex;
-      border-top: 1px solid #ccc;
+      margin-bottom: 1rem;
     }
     input {
       flex: 1;
-      padding: 1rem;
-      border: none;
-      font-size: 1rem;
+      padding: 0.8rem;
+      border: 1px solid #ccc;
+      border-radius: 8px 0 0 8px;
     }
     button {
-      padding: 1rem 1.5rem;
+      padding: 0.8rem 1.2rem;
       border: none;
       background: #1e88e5;
       color: white;
-      font-weight: bold;
       cursor: pointer;
+      border-radius: 0 8px 8px 0;
     }
-    button:hover {
-      background: #1669bb;
+    .guess-buttons button {
+      margin: 0.5rem;
+      background: #43a047;
+      border-radius: 5px;
+    }
+    .result {
+      text-align: center;
+      font-weight: bold;
+      color: #6a1b9a;
+      margin-top: 1rem;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Test de Turing - Qui est l’IA ?</h1>
+    <h1>Test de Turing : Qui est l'IA ?</h1>
+    <p class="description">Pose une question. Deux bots vont répondre : l’un est une IA (GPT), l’autre un humain simulé. Devine ensuite lequel est l'IA !</p>
+
     <div class="chat" id="chatbox"></div>
+
     <div class="input-group">
-      <input id="msgInput" type="text" placeholder="Pose ta question ici...">
+      <input id="msgInput" placeholder="Pose une question...">
       <button onclick="sendToBots()">Envoyer</button>
     </div>
+
+    <div id="guess" class="guess-buttons" style="display: none;">
+      <p>Qui est l'IA ?</p>
+      <button onclick="guess('A')">Bot A</button>
+      <button onclick="guess('B')">Bot B</button>
+    </div>
+
+    <div id="result" class="result"></div>
   </div>
 
   <script>
+    let messages = [];
+    let botRoles = ['gpt', 'fake'];
+    let guessed = false;
+    let userInput = "";
+
+    // Mélange les rôles pour A et B
+    botRoles.sort(() => Math.random() - 0.5);
+
     function append(sender, text) {
       const div = document.createElement('div');
-      div.className = 'message ' + (sender === 'User' ? 'user' : 'bot');
-      div.innerHTML = `<strong>${sender}</strong><br>${text}`;
+      div.className = 'message ' + sender;
+      div.innerHTML = text;
       document.getElementById('chatbox').appendChild(div);
       document.getElementById('chatbox').scrollTop = document.getElementById('chatbox').scrollHeight;
     }
@@ -98,16 +116,30 @@
       const input = document.getElementById('msgInput');
       const text = input.value;
       if (!text.trim()) return;
-      append('User', text);
+      userInput = text;
+      append('user', `<strong>Vous :</strong> ${text}`);
       input.value = '';
-      ['gpt', 'fake'].forEach(role => {
+
+      ['A', 'B'].forEach((label, i) => {
+        const role = botRoles[i];
         const form = new FormData();
         form.append('message', text);
         form.append('role', role);
         fetch('/send/', { method: 'POST', body: form })
           .then(res => res.json())
-          .then(data => append(role === 'gpt' ? 'Bot GPT' : 'Bot Fake', data.reply));
+          .then(data => append(`bot${label}`, `<strong>Bot ${label} :</strong> ${data.reply}`));
       });
+
+      document.getElementById('guess').style.display = 'block';
+      document.getElementById('result').innerText = '';
+    }
+
+    function guess(choice) {
+      if (guessed) return;
+      guessed = true;
+      const isCorrect = botRoles[choice === 'A' ? 0 : 1] === 'gpt';
+      const result = isCorrect ? "Bonne réponse ! Bot " + choice + " est l'IA." : "Raté ! Ce n’était pas le bon.";
+      document.getElementById('result').innerText = result;
     }
   </script>
 </body>
